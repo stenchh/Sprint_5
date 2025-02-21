@@ -3,33 +3,40 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from locators import ConstructorPageLocators
 
-def test_main_page_sousi(browser_google):
-    driver = browser_google
-    element = driver.find_element(By.XPATH, "//*[@id='root']/div/main/section[1]/div[2]/h2[2]") #Раздел Соусы
-    driver.execute_script("arguments[0].scrollIntoView();", element)
 
-def test_main_page_bulki(browser_google):
-    driver = browser_google
-    element = driver.find_element(By.XPATH, "//*[@id='root']/div/main/section[1]/div[2]/h2[1]") #Раздел Булки
-    driver.execute_script("arguments[0].scrollIntoView();", element)
+class TestsActivityOfTabsConstructor:
 
-def test_main_page_nachinki(browser_google):
-    driver = browser_google
-    element = driver.find_element(By.XPATH, "//*[@id='root']/div/main/section[1]/div[2]/h2[3]") #Раздел Начинка
-    driver.execute_script("arguments[0].scrollIntoView();", element)
+    @pytest.mark.parametrize("browser", ["chrome", "firefox"], indirect=True)
+    def test_tab_main_page_sousi(self, browser):
+        driver = browser
+        tab_sousi = driver.find_element(*ConstructorPageLocators.SOUSI_TAB)
+        tab_sousi.click()
 
-def test_main_page_sousi(browser_mozilla):
-    driver = browser_mozilla
-    element = driver.find_element(By.XPATH, "//*[@id='root']/div/main/section[1]/div[2]/h2[2]") #Раздел Соусы
-    driver.execute_script("arguments[0].scrollIntoView();", element)
 
-def test_main_page_bulki(browser_mozilla):
-    driver = browser_mozilla
-    element = driver.find_element(By.XPATH, "//*[@id='root']/div/main/section[1]/div[2]/h2[1]") #Раздел Булки
-    driver.execute_script("arguments[0].scrollIntoView();", element)
+        assert "tab_tab_type_current__2BEPc" in tab_sousi.get_attribute("class")
 
-def test_main_page_nachinki(browser_mozilla):
-    driver = browser_mozilla
-    element = driver.find_element(By.XPATH, "//*[@id='root']/div/main/section[1]/div[2]/h2[3]") #Раздел Начинка
-    driver.execute_script("arguments[0].scrollIntoView();", element)
+
+
+    @pytest.mark.parametrize("browser", ["chrome", "firefox"], indirect=True)
+    def test_tab_main_page_bulki(self, browser):
+        driver = browser
+
+        tab_bulki = driver.find_element(*ConstructorPageLocators.BULKI_TAB)
+        tab_bulki.click()
+
+
+        assert "tab_tab_type_current__2BEPc" in tab_bulki.get_attribute("class")
+
+
+
+
+    @pytest.mark.parametrize("browser", ["chrome", "firefox"], indirect=True)
+    def test_tab_main_page_nachinki(self, browser):
+        driver = browser
+        tab_nachinki = driver.find_element(*ConstructorPageLocators.NACHINKI_TAB)
+        tab_nachinki.click()
+
+        assert "tab_tab_type_current__2BEPc" in tab_nachinki.get_attribute("class")
+

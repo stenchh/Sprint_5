@@ -1,148 +1,90 @@
 import pytest
-from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from locators import RegistrationPageLocators
 
+class TestRegistration:
 
-def test_register_google(browser_google,auth_data):
-    driver = browser_google
-    driver.find_element(By.XPATH, "//button[contains(text(),'Войти в аккаунт')]").click() # Кнопка войти
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.LINK_TEXT, "Зарегистрироваться"))) #Линк-текст "Зарегистрироваться"
+    @pytest.mark.parametrize("browser", ["chrome", "firefox"], indirect=True)
+    def test_register_with_all_data(self, browser, generate_email, generate_password):
+        driver = browser
+        email = generate_email
+        password = generate_password()
 
-    driver.find_element(By.LINK_TEXT, "Зарегистрироваться").click()
+        driver.find_element(*RegistrationPageLocators.LOGIN_BUTTON).click()
+        WebDriverWait(driver, 3).until(EC.visibility_of_element_located(RegistrationPageLocators.REGISTER_LINK))
 
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, "//label[contains(text(), 'Email')]"))) #Плейсхолдер почты
+        driver.find_element(*RegistrationPageLocators.REGISTER_LINK).click()
 
-    driver.find_element(By.NAME, "name").send_keys("Елена") #Поле ввода имени
-    driver.find_element(By.XPATH, "//*[@id='root']/div/main/div/form/fieldset[2]/div/div/input").send_keys(auth_data['email']) #Поле ввода почты
-    driver.find_element(By.NAME, "Пароль").send_keys(auth_data["password"]) #Поле ввода пароля
+        WebDriverWait(driver, 3).until(EC.visibility_of_element_located(RegistrationPageLocators.EMAIL_LABEL))
 
-    driver.find_element(By.XPATH, "//button[contains(text(), 'Зарегистрироваться')]").click() #Кнопка регистрации
+        driver.find_element(*RegistrationPageLocators.NAME_INPUT).send_keys("Елена")
+        driver.find_element(*RegistrationPageLocators.EMAIL_INPUT).send_keys(email)
+        driver.find_element(*RegistrationPageLocators.PASSWORD_INPUT).send_keys(password)
 
-    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By. XPATH, "//button[contains(text(),'Войти')]"))) #Кнопка Войти
+        driver.find_element(*RegistrationPageLocators.REGISTER_BUTTON).click()
 
-def test_register_google_with_empty_name(browser_google,auth_data):
-    driver = browser_google
-    driver.find_element(By.XPATH, "//button[contains(text(),'Войти в аккаунт')]").click() # Кнопка войти
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.LINK_TEXT, "Зарегистрироваться"))) #Линк-текст "Зарегистрироваться"
+        WebDriverWait(driver, 5).until(EC.visibility_of_element_located(RegistrationPageLocators.LOGIN_BUTTON))
+        assert driver.find_element(*RegistrationPageLocators.LOGIN_BUTTON).is_displayed()
 
-    driver.find_element(By.LINK_TEXT, "Зарегистрироваться").click()
+    @pytest.mark.parametrize("browser", ["chrome", "firefox"], indirect=True)
+    def test_register_google_with_empty_name(self, browser, generate_email, generate_password):
+        driver = browser
+        email = generate_email
+        password = generate_password()
 
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, "//label[contains(text(), 'Email')]"))) #Плейсхолдер почты
+        driver.find_element(*RegistrationPageLocators.LOGIN_BUTTON).click()
+        WebDriverWait(driver, 3).until(EC.visibility_of_element_located(RegistrationPageLocators.REGISTER_LINK))
 
-    driver.find_element(By.XPATH, "//*[@id='root']/div/main/div/form/fieldset[2]/div/div/input").send_keys(auth_data['email']) #Поле ввода почты
-    driver.find_element(By.XPATH, "//input[@name='Пароль']").send_keys(auth_data['password']) #Поле ввода пароля
+        driver.find_element(*RegistrationPageLocators.REGISTER_LINK).click()
 
-    driver.find_element(By.XPATH, "//button[contains(text(), 'Зарегистрироваться')]").click()  #Кнопка регистрации
+        WebDriverWait(driver, 3).until(EC.visibility_of_element_located(RegistrationPageLocators.EMAIL_LABEL))
 
-    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//button[contains(text(),'Войти')]"))) #Кнопка Войти
+        driver.find_element(*RegistrationPageLocators.EMAIL_INPUT).send_keys(email)
+        driver.find_element(*RegistrationPageLocators.PASSWORD_INPUT).send_keys(password)
 
-def test_register_google_with_len_password_5(browser_google,auth_data):
-    driver = browser_google
-    driver.find_element(By.XPATH, "//button[contains(text(),'Войти в аккаунт')]").click() # Кнопка войти
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.LINK_TEXT, "Зарегистрироваться"))) #Линк-текст "Зарегистрироваться"
+        driver.find_element(*RegistrationPageLocators.REGISTER_BUTTON).click()
 
-    driver.find_element(By.LINK_TEXT, "Зарегистрироваться").click()
+        WebDriverWait(driver, 5).until(EC.visibility_of_element_located(RegistrationPageLocators.LOGIN_BUTTON))
+        assert driver.find_element(*RegistrationPageLocators.LOGIN_BUTTON).is_displayed()
 
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, "//label[contains(text(), 'Email')]"))) #Плейсхолдер почты
+    @pytest.mark.parametrize("browser", ["chrome", "firefox"], indirect=True)
+    def test_register_google_with_len_password_5(self, browser, generate_email):
+        driver = browser
+        email = generate_email
 
-    driver.find_element(By.NAME, "name").send_keys("Елена") #Поле ввода имени
-    driver.find_element(By.XPATH, "//*[@id='root']/div/main/div/form/fieldset[2]/div/div/input").send_keys(auth_data['email']) #Поле ввода почты
-    driver.find_element(By.XPATH, "//input[@name='Пароль']").send_keys('12345') #Поле ввода пароля
+        driver.find_element(*RegistrationPageLocators.LOGIN_BUTTON).click()
+        WebDriverWait(driver, 3).until(EC.visibility_of_element_located(RegistrationPageLocators.REGISTER_LINK))
 
-    driver.find_element(By.XPATH, "//button[contains(text(), 'Зарегистрироваться')]").click()  #Кнопка регистрации
+        driver.find_element(*RegistrationPageLocators.REGISTER_LINK).click()
 
-    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//button[contains(text(),'Войти')]"))) #Кнопка Войти
+        WebDriverWait(driver, 3).until(EC.visibility_of_element_located(RegistrationPageLocators.EMAIL_LABEL))
 
-def test_register_google_with_email_without_at_symbol(browser_google,auth_data):
-    driver = browser_google
-    driver.find_element(By.XPATH, "//button[contains(text(),'Войти в аккаунт')]").click() # Кнопка войти
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.LINK_TEXT, "Зарегистрироваться"))) #Линк-текст "Зарегистрироваться"
+        driver.find_element(*RegistrationPageLocators.NAME_INPUT).send_keys("Елена")
+        driver.find_element(*RegistrationPageLocators.EMAIL_INPUT).send_keys(email)
+        driver.find_element(*RegistrationPageLocators.PASSWORD_INPUT).send_keys('12345')
 
-    driver.find_element(By.LINK_TEXT, "Зарегистрироваться").click()
+        driver.find_element(*RegistrationPageLocators.REGISTER_BUTTON).click()
 
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, "//label[contains(text(), 'Email')]"))) #Плейсхолдер почты
+        WebDriverWait(driver, 5).until(EC.visibility_of_element_located(RegistrationPageLocators.LOGIN_BUTTON))
+        assert driver.find_element(*RegistrationPageLocators.LOGIN_BUTTON).is_displayed()
 
-    driver.find_element(By.NAME, "name").send_keys("Елена") #Поле ввода имени
-    driver.find_element(By.XPATH, "//*[@id='root']/div/main/div/form/fieldset[2]/div/div/input").send_keys('shagova123.com') #Поле ввода почты
-    driver.find_element(By.XPATH, "//input[@name='Пароль']").send_keys('12345') #Поле ввода пароля
+    @pytest.mark.parametrize("browser", ["chrome", "firefox"], indirect=True)
+    def test_register_google_with_email_without_at_symbol(self, browser):
+        driver = browser
 
-    driver.find_element(By.XPATH, "//button[contains(text(), 'Зарегистрироваться')]").click()  #Кнопка регистрации
+        driver.find_element(*RegistrationPageLocators.LOGIN_BUTTON).click()
+        WebDriverWait(driver, 3).until(EC.visibility_of_element_located(RegistrationPageLocators.REGISTER_LINK))
 
-    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//button[contains(text(),'Войти')]"))) #Кнопка Войти
+        driver.find_element(*RegistrationPageLocators.REGISTER_LINK).click()
 
-def test_register_mozilla(browser_mozilla,auth_data):
-    driver = browser_mozilla
-    driver.find_element(By.XPATH, "//button[contains(text(),'Войти в аккаунт')]").click() # Кнопка войти
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.LINK_TEXT, "Зарегистрироваться"))) #Линк-текст "Зарегистрироваться"
+        WebDriverWait(driver, 3).until(EC.visibility_of_element_located(RegistrationPageLocators.EMAIL_LABEL))
 
-    driver.find_element(By.LINK_TEXT, "Зарегистрироваться").click()
+        driver.find_element(*RegistrationPageLocators.NAME_INPUT).send_keys("Елена")
+        driver.find_element(*RegistrationPageLocators.EMAIL_INPUT).send_keys('shagova123.com')
+        driver.find_element(*RegistrationPageLocators.PASSWORD_INPUT).send_keys('12345')
 
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, "//label[contains(text(), 'Email')]"))) #Плейсхолдер почты
+        driver.find_element(*RegistrationPageLocators.REGISTER_BUTTON).click()
 
-    driver.find_element(By.NAME, "name").send_keys("Елена") #Поле ввода имени
-    driver.find_element(By.XPATH, "//*[@id='root']/div/main/div/form/fieldset[2]/div/div/input").send_keys(auth_data['email']) #Поле ввода почты
-    driver.find_element(By.NAME, "Пароль").send_keys(auth_data["password"]) #Поле ввода пароля
-
-    driver.find_element(By.XPATH, "//button[contains(text(), 'Зарегистрироваться')]").click() #Кнопка регистрации
-
-    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By. XPATH, "//button[contains(text(),'Войти')]"))) #Кнопка Войти
-
-def test_register_with_empty_name(browser_mozilla,auth_data):
-    driver = browser_mozilla
-    driver.find_element(By.XPATH, "//button[contains(text(),'Войти в аккаунт')]").click() # Кнопка войти
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.LINK_TEXT, "Зарегистрироваться"))) #Линк-текст "Зарегистрироваться"
-
-    driver.find_element(By.LINK_TEXT, "Зарегистрироваться").click()
-
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, "//label[contains(text(), 'Email')]"))) #Плейсхолдер почты
-
-    driver.find_element(By.XPATH, "//*[@id='root']/div/main/div/form/fieldset[2]/div/div/input").send_keys(auth_data['email']) #Поле ввода почты
-    driver.find_element(By.XPATH, "//input[@name='Пароль']").send_keys(auth_data['password']) #Поле ввода пароля
-
-    driver.find_element(By.XPATH, "//button[contains(text(), 'Зарегистрироваться')]").click()  #Кнопка регистрации
-
-    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//button[contains(text(),'Войти')]"))) #Кнопка Войти
-
-def test_register_with_len_password_5(browser_mozilla,auth_data):
-    driver = browser_mozilla
-    driver.find_element(By.XPATH, "//button[contains(text(),'Войти в аккаунт')]").click() # Кнопка войти
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.LINK_TEXT, "Зарегистрироваться"))) #Линк-текст "Зарегистрироваться"
-
-    driver.find_element(By.LINK_TEXT, "Зарегистрироваться").click()
-
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, "//label[contains(text(), 'Email')]"))) #Плейсхолдер почты
-
-    driver.find_element(By.NAME, "name").send_keys("Елена") #Поле ввода имени
-    driver.find_element(By.XPATH, "//*[@id='root']/div/main/div/form/fieldset[2]/div/div/input").send_keys(auth_data['email']) #Поле ввода почты
-    driver.find_element(By.XPATH, "//input[@name='Пароль']").send_keys('12345') #Поле ввода пароля
-
-    driver.find_element(By.XPATH, "//button[contains(text(), 'Зарегистрироваться')]").click()  #Кнопка регистрации
-
-    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//button[contains(text(),'Войти')]"))) #Кнопка Войти
-
-def test_register_with_email_without_at_symbol(browser_mozilla,auth_data):
-    driver = browser_mozilla
-    driver.find_element(By.XPATH, "//button[contains(text(),'Войти в аккаунт')]").click() # Кнопка войти
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.LINK_TEXT, "Зарегистрироваться"))) #Линк-текст "Зарегистрироваться"
-
-    driver.find_element(By.LINK_TEXT, "Зарегистрироваться").click()
-
-    WebDriverWait(driver, 3).until(EC.visibility_of_element_located((By.XPATH, "//label[contains(text(), 'Email')]"))) #Плейсхолдер почты
-
-    driver.find_element(By.NAME, "name").send_keys("Елена") #Поле ввода имени
-    driver.find_element(By.XPATH, "//*[@id='root']/div/main/div/form/fieldset[2]/div/div/input").send_keys('shagova123.com') #Поле ввода почты
-    driver.find_element(By.XPATH, "//input[@name='Пароль']").send_keys('12345') #Поле ввода пароля
-
-    driver.find_element(By.XPATH, "//button[contains(text(), 'Зарегистрироваться')]").click()  #Кнопка регистрации
-
-    WebDriverWait(driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//button[contains(text(),'Войти')]"))) #Кнопка Войти
-
-
-
-
-
-
-
-
+        WebDriverWait(driver, 5).until(EC.visibility_of_element_located(RegistrationPageLocators.LOGIN_BUTTON))
+        assert driver.find_element(*RegistrationPageLocators.LOGIN_BUTTON).is_displayed()

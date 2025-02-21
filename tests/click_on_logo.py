@@ -3,17 +3,20 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from locators import LoginPageLocators
+from locators import ConstructorPageLocators
 
-def test_click_on_logo(login_google):
-    login_google.find_element(By.XPATH, "//*[@id='root']/div/header/nav/a").click()
-    WebDriverWait(login_google, 5).until(EC.visibility_of_element_located((By.XPATH, "//*[@id='root']/div/main/div/div/div/div/button[2]"))) #Кнопка "Сохранить"
+class TestClickOnLogo:
+    @pytest.mark.parametrize("browser", ["chrome", "firefox"], indirect=True)
+    def test_click_on_logo_move_main_page(self, browser, login):
+        driver = browser
+        driver.find_element(*LoginPageLocators.PERSONAL_ACCOUNT_BUTTON).click()
+        WebDriverWait(driver, 5).until(EC.visibility_of_element_located(ConstructorPageLocators.SIGN_OUT_BUTTON))
 
-    login_google.find_element(By.XPATH, "//*[@id='root']/div/header/nav/div/a").click() #Логотип
-    WebDriverWait(login_google, 5).until(EC.visibility_of_element_located((By.XPATH, "//button[contains(text(),'Оформить заказ')]"))) #Кнопка "Оформить заказ"
+        driver.find_element(*ConstructorPageLocators.LOGO_HEADER).click()
+        WebDriverWait(driver, 5).until(EC.visibility_of_element_located(LoginPageLocators.ORDER_BUTTON))
 
-def test_click_on_logo(login_mozilla):
-    login_mozilla.find_element(By.XPATH, "//*[@id='root']/div/header/nav/a").click()
-    WebDriverWait(login_mozilla, 5).until(EC.visibility_of_element_located((By.XPATH, "//*[@id='root']/div/main/div/div/div/div/button[2]"))) #Кнопка "Сохранить"
+        assert driver.find_element(*LoginPageLocators.ORDER_BUTTON).is_displayed()
 
-    login_mozilla.find_element(By.XPATH, "//*[@id='root']/div/header/nav/div/a").click() #Логотип
-    WebDriverWait(login_mozilla, 5).until(EC.visibility_of_element_located((By.XPATH, "//button[contains(text(),'Оформить заказ')]"))) #Кнопка "Оформить заказ"
+
+
